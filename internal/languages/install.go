@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/sol-eng/wbi/internal/config"
+	"github.com/samcofer/tam-offline-download-email/internal/config"
 )
 
 // InstallerInfo contains the information needed to download and install R and Python

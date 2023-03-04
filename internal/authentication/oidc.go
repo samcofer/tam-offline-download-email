@@ -4,8 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/AlecAivazis/survey/v2"
-	"github.com/sol-eng/wbi/internal/config"
+	"github.com/samcofer/tam-offline-download-email/internal/config"
 )
 
 // Run functions and store values in the OIDCConfig

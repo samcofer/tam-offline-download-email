@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sol-eng/wbi/internal/system"
+	"github.com/samcofer/tam-offline-download-email/internal/system"
 )
 
 func WriteConfig(WBConfig WBConfig) error {

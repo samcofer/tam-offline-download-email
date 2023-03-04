@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sol-eng/wbi/internal/config"
-	"github.com/sol-eng/wbi/internal/install"
-	"github.com/sol-eng/wbi/internal/system"
+	"github.com/samcofer/tam-offline-download-email/internal/config"
+	"github.com/samcofer/tam-offline-download-email/internal/install"
+	"github.com/samcofer/tam-offline-download-email/internal/system"
 )
 
 func InstallPrereqs(osType config.OperatingSystem) error {

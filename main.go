@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"html/template"
 
-	"tam-offline-download-email/internal/config"
+	"github.com/samcofer/tam-offline-download-email"
 )
 
 )

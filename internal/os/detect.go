@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/sol-eng/wbi/internal/config"
+	"github.com/samcofer/tam-offline-download-email/internal/config"
 )
 
 // Detect which operating system WBI is running on
