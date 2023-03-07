@@ -192,7 +192,7 @@ func DownloadAndInstallR(rVersion string, osType config.OperatingSystem) error {
 		return fmt.Errorf("DownloadR: %w", err)
 	}
 	// Install R
-	err = install.InstallLanguage("r", filepath, osType, rVersion)
+	err = install.InstallLanguage(osType)
 	if err != nil {
 		return fmt.Errorf("InstallLanguage: %w", err)
 	}

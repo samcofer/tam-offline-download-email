@@ -21,7 +21,7 @@ type setupCmd struct {
 type setupOpts struct {
 }
 
-func newSetup(setupOpts setupOpts) error {
+func newSetup() error {
 
 	var WBConfig config.WBConfig
 
@@ -86,7 +86,7 @@ func newSetup(setupOpts setupOpts) error {
 	return nil
 }
 
-func setSetupOpts(setupOpts *setupOpts) {
+func setSetupOpts() {
 
 }
 
@@ -101,7 +101,7 @@ func newSetupCmd() *setupCmd {
 		Use:   "setup",
 		Short: "setup",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			setSetupOpts(&root.opts)
+			setSetupOpts()
 			if err := root.opts.Validate(); err != nil {
 				return err
 			}
@@ -110,7 +110,7 @@ func newSetupCmd() *setupCmd {
 		RunE: func(_ *cobra.Command, args []string) error {
 			//TODO: Add your logic to gather config to pass code here
 			log.WithField("opts", fmt.Sprintf("%+v", root.opts)).Trace("setup-opts")
-			if err := newSetup(root.opts); err != nil {
+			if err := newSetup(); err != nil {
 				return err
 			}
 			return nil

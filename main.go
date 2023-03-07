@@ -8,11 +8,9 @@ import (
 	"runtime"
 )
 
-// https://goreleaser.com/cookbooks/using-main.version
 var (
 	version string = "dev"
 	commit  string = "none"
-	date    string = "unknown"
 )
 
 func main() {

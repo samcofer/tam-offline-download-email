@@ -7,40 +7,6 @@ import (
 	"github.com/samcofer/tam-offline-download-email/internal/system"
 )
 
-func WriteConfig(WBConfig WBConfig) error {
-	if WBConfig.PythonConfig.JupyterPath != "" {
-		err := WBConfig.PythonConfig.PythonStructToConfigWrite()
-		if err != nil {
-			return fmt.Errorf("failed to write python config: %w", err)
-		}
-	}
-	if WBConfig.SSLConfig.UseSSL {
-		err := WBConfig.SSLConfig.SSLStructToConfigWrite()
-		if err != nil {
-			return fmt.Errorf("failed to write SSL config: %w", err)
-		}
-	}
-	if WBConfig.AuthConfig.Using {
-		err := WBConfig.AuthConfig.AuthStructToConfigWrite()
-		if err != nil {
-			return fmt.Errorf("failed to write Authentication config: %w", err)
-		}
-	}
-	if WBConfig.PackageManagerConfig.Using {
-		err := WBConfig.PackageManagerStringToConfigWrite()
-		if err != nil {
-			return fmt.Errorf("failed to write Package Manager config: %w", err)
-		}
-	}
-	if WBConfig.ConnectConfig.Using {
-		err := WBConfig.ConnectStringToConfigWrite()
-		if err != nil {
-			return fmt.Errorf("failed to write Connect config: %w", err)
-		}
-	}
-	return nil
-}
-
 // Prints the PythonConfig configuration struct information to the console
 func (PythonConfig *PythonConfig) PythonStructToConfigWrite() error {
 	writeLines := []string{

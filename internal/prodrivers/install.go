@@ -5,13 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"os"
-	"time"
-
 	"github.com/samcofer/tam-offline-download-email/internal/config"
-	"github.com/samcofer/tam-offline-download-email/internal/install"
-	"github.com/samcofer/tam-offline-download-email/internal/system"
+	"net/http"
+	"time"
 )
 
 // InstallerInfo contains the information needed to download and install Posit Pro Drivers
@@ -78,38 +74,6 @@ func DownloadAndInstallProDrivers(osType config.OperatingSystem) error {
 	return nil
 }
 
-// Installs Posit Pro Drivers in a certain way based on the operating system
-func InstallProDrivers(filepath string, osType config.OperatingSystem) error {
-	installCommand, err := install.RetrieveInstallCommand(osType)
-	if err != nil {
-		return fmt.Errorf("RetrieveInstallCommand: %w", err)
-	}
-
-	//err = system.RunCommand(installCommand)
-	if err != nil {
-		return fmt.Errorf("issue installing Pro Drivers: %w", err)
-	}
-
-	fmt.Println("\nPosit Pro Drivers have been successfully installed!\n")
-	fmt.Println(installCommand)
-	return nil
-}
-
-// Pulls out the installer information from the JSON data based on the operating system
-func (pd *ProDrivers) GetInstallerInfo(osType config.OperatingSystem) (InstallerInfo, error) {
-	switch osType {
-	// Posit Pro Drivers are the same for all Ubuntu versions
-	case config.Ubuntu18, config.Ubuntu20, config.Ubuntu22:
-		return pd.ProDrivers.Installer.Focal, nil
-	case config.Redhat7:
-		return pd.ProDrivers.Installer.Redhat7, nil
-	case config.Redhat8:
-		return pd.ProDrivers.Installer.Redhat8, nil
-	default:
-		return InstallerInfo{}, errors.New("operating system not supported")
-	}
-}
-
 // Retrieves JSON data from Posit
 func RetrieveProDriversInstallerInfo() (ProDrivers, error) {
 	client := &http.Client{
@@ -136,41 +100,17 @@ func RetrieveProDriversInstallerInfo() (ProDrivers, error) {
 	return proDrivers, nil
 }
 
-// Installs unixODBC and unixODBC-devel
-func InstallUnixODBC(osType config.OperatingSystem) error {
-	if osType == config.Ubuntu22 || osType == config.Ubuntu20 || osType == config.Ubuntu18 {
-		err := system.RunCommand("apt-get -y install unixodbc unixodbc-dev")
-		if err != nil {
-			return fmt.Errorf("issue installing unixodbc and unixodbc-dev: %w", err)
-		}
-	} else if osType == config.Redhat7 || osType == config.Redhat8 {
-		err := system.RunCommand("yum -y install unixODBC unixODBC-devel")
-		if err != nil {
-			return fmt.Errorf("issue installing unixodbc and unixodbc-dev: %w", err)
-		}
-	} else {
-		return errors.New("operating system not supported")
+// Pulls out the installer information from the JSON data based on the operating system
+func (pd *ProDrivers) GetInstallerInfo(osType config.OperatingSystem) (InstallerInfo, error) {
+	switch osType {
+	// Posit Pro Drivers are the same for all Ubuntu versions
+	case config.Ubuntu18, config.Ubuntu20, config.Ubuntu22:
+		return pd.ProDrivers.Installer.Focal, nil
+	case config.Redhat7:
+		return pd.ProDrivers.Installer.Redhat7, nil
+	case config.Redhat8:
+		return pd.ProDrivers.Installer.Redhat8, nil
+	default:
+		return InstallerInfo{}, errors.New("operating system not supported")
 	}
-
-	fmt.Println("\nunixodbc and unixodbc-dev has been successfully installed!\n")
-	return nil
-}
-
-func BackupAndAppendODBCConfiguration() error {
-	// backup odbcinst.ini if one already exists
-	if _, err := os.Stat("/etc/odbcinst.ini"); err == nil {
-		fmt.Println("Backing up /etc/odbcinst.ini to /etc/odbcinst.ini.bak")
-		err := system.RunCommand("cp /etc/odbcinst.ini /etc/odbcinst.ini.bak")
-		if err != nil {
-			return fmt.Errorf("issue backing up /etc/odbcinst.ini: %w", err)
-		}
-	}
-	// append sample ODBC configuration to odbcinst.ini
-	_, _, err := system.RunCommandAndCaptureOutput("cat /opt/rstudio-drivers/odbcinst.ini.sample | tee -a /etc/odbcinst.ini")
-	if err != nil {
-		return fmt.Errorf("issue appending sample configuration to /etc/odbcinst.ini: %w", err)
-	}
-
-	fmt.Println("\nThe sample preconfigured odbcinst.ini has been appended to /etc/odbcinst.ini\n")
-	return nil
 }

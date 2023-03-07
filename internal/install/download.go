@@ -5,7 +5,7 @@ import (
 )
 
 // Create a temporary file and download the installer to it.
-func DownloadFile(installerName string, url string, filename string) string {
+func DownloadFile(url string, filename string) string {
 
 	fmt.Println("Workbench download URL: " + url)
 

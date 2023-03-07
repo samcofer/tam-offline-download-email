@@ -7,7 +7,7 @@ import (
 )
 
 // Installs R/Python in a certain way based on the operating system
-func InstallLanguage(language string, filepath string, osType config.OperatingSystem, version string) error {
+func InstallLanguage(osType config.OperatingSystem) error {
 
 	_, err := RetrieveInstallCommand(osType)
 	//print("Here is the install command" + installCommand)

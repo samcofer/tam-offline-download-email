@@ -66,7 +66,7 @@ func DownloadAndInstallWorkbench(osType config.OperatingSystem) error {
 		return fmt.Errorf("GetInstallerInfo: %w", err)
 	}
 	// Download installer
-	filepath := install.DownloadFile("Workbench", installerInfo.URL, installerInfo.BaseName)
+	filepath := install.DownloadFile(installerInfo.URL, installerInfo.BaseName)
 	if err != nil {
 		return fmt.Errorf("DownloadFile: %w", err)
 	}
