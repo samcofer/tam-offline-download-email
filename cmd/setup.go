@@ -10,6 +10,7 @@ import (
 	"github.com/samcofer/tam-offline-download-email/internal/os"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"text/template"
 )
 
 type setupCmd struct {
@@ -20,42 +21,52 @@ type setupCmd struct {
 type setupOpts struct {
 }
 
-func newSetup(OS string) error {
+type downloadURLs struct {
+	R              []string
+	Python         []string
+	Workbench      string
+	Connect        string
+	PackageManager string
+	ProDriver      string
+}
 
-	//fmt.Println("Welcome to the Workbench Installer!\n")
+func newSetup(OS string, cust string) error {
 
-	//// Check if running as root
-	//err := os.CheckIfRunningAsRoot()
-	//if err != nil {
-	//	return err
-	//}
+	var URLs downloadURLs
+
 	// Determine OS and install pre-requisites
-
 	osType, err := os.DetectOS(OS)
 	if err != nil {
 		return fmt.Errorf("issue selecting languages: %w", err)
 	}
 
 	// R
-	err = languages.ScanAndHandleRVersions(osType)
+	URLs.R, err = languages.ScanAndHandleRVersions(osType)
 	if err != nil {
 		return fmt.Errorf("issue finding R locations: %w", err)
 	}
 
 	//Python
-	err = languages.ScanAndHandlePythonVersions(osType)
+	URLs.Python, err = languages.ScanAndHandlePythonVersions(osType)
 	if err != nil {
 		return fmt.Errorf("issue finding Python locations: %w", err)
 	}
 
 	//workbench
-	workbench.DownloadAndInstallWorkbench(osType)
+	URLs.Workbench, URLs.Connect, URLs.PackageManager, err = workbench.DownloadAndInstallWorkbench(osType)
 	if err != nil {
 		return fmt.Errorf("issue installing Workbench: %w", err)
 	}
 
 	//drivers
-	prodrivers.DownloadAndInstallProDrivers(osType)
+	URLs.ProDriver, err = prodrivers.DownloadAndInstallProDrivers(osType)
+
+	fmt.Println(URLs.R)
+	fmt.Println(URLs.Python)
+	fmt.Println(URLs.Workbench)
+	fmt.Println(URLs.Connect)
+	fmt.Println(URLs.PackageManager)
+	fmt.Println(URLs.ProDriver)
 
 	return nil
 }
@@ -84,7 +95,7 @@ func newSetupCmd() *setupCmd {
 		RunE: func(_ *cobra.Command, args []string) error {
 			//TODO: Add your logic to gather config to pass code here
 			log.WithField("opts", fmt.Sprintf("%+v", root.opts)).Trace("setup-opts")
-			if err := newSetup(viper.GetString("os")); err != nil {
+			if err := newSetup(viper.GetString("os"), viper.GetString("cust")); err != nil {
 				return err
 			}
 			return nil
@@ -92,6 +103,14 @@ func newSetupCmd() *setupCmd {
 	}
 	cmd.PersistentFlags().String("os", "rhel8", "destinationOS")
 	viper.BindPFlag("os", cmd.PersistentFlags().Lookup("os"))
+	cmd.PersistentFlags().String("cust", "REPLACE_ME", "Customer Name")
+	viper.BindPFlag("cust", cmd.PersistentFlags().Lookup("cust"))
 	root.cmd = cmd
 	return root
+}
+
+func EmailTemplate(url downloadURLs, customer string) {
+
+	t, _ := template.ParseFiles("index.html")
+
 }

@@ -37,41 +37,24 @@ type ProDrivers struct {
 }
 
 // DownloadAndInstallProDrivers Retrieves JSON data from Posit, downloads the Pro Drivers installer, and installs Pro Drivers
-func DownloadAndInstallProDrivers(osType config.OperatingSystem) error {
+func DownloadAndInstallProDrivers(osType config.OperatingSystem) (string, error) {
 	// Retrieve JSON data
 	rstudio, err := RetrieveProDriversInstallerInfo()
 	if err != nil {
-		return fmt.Errorf("RetrieveProDriversInstallerInfo: %w", err)
+		return "error", fmt.Errorf("RetrieveProDriversInstallerInfo: %w", err)
 	}
 	// Retrieve installer info
 	installerInfo, err := rstudio.GetInstallerInfo(osType)
 	if err != nil {
-		return fmt.Errorf("GetInstallerInfo: %w", err)
+		return "error", fmt.Errorf("GetInstallerInfo: %w", err)
 	}
-	// Install prerequisites
-	//err = InstallUnixODBC(osType)
-	//if err != nil {
-	//	return fmt.Errorf("InstallUnixODBC: %w", err)
-	//}
-	// Download installer
-	//install.DownloadFile("Pro Drivers", installerInfo.URL, installerInfo.BaseName)
 
-	fmt.Println("Pro Driver Download URL: " + installerInfo.URL)
+	DriverURL := "Pro Driver Download URL: " + installerInfo.URL
 	if err != nil {
-		return fmt.Errorf("DownloadFile: %w", err)
+		return "error", fmt.Errorf("DownloadFile: %w", err)
 	}
-	// Install Pro Drivers
-	//err = InstallProDrivers(filepath, osType)
-	//if err != nil {
-	//	return fmt.Errorf("InstallProDrivers: %w", err)
-	//}
-	// Configure ODBC driver name and locations
-	//err = BackupAndAppendODBCConfiguration()
-	//if err != nil {
-	//	return fmt.Errorf("BackupAndAppendODBCConfiguration: %w", err)
-	//}
-	//fmt.Println("\nPosit Pro Drivers next steps:\nNow that the Pro Drivers are installed and /etc/odbcinst.ini is set up, the next step is to test database connectivity and/or create DSNs in your /etc/odbc.ini file.\n\n More information about each of these steps can be found here: https://docs.posit.co/pro-drivers/workbench-connect/#step-4-testing-database-connectivity\n")
-	return nil
+
+	return DriverURL, nil
 }
 
 // RetrieveProDriversInstallerInfo Retrieves JSON data from Posit

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/samcofer/tam-offline-download-email/internal/config"
-	"github.com/samcofer/tam-offline-download-email/internal/install"
 )
 
 var availablePythonVersions = []string{
@@ -88,7 +87,8 @@ var availablePythonVersions = []string{
 
 // Prompts user if they want to install Python and does the installation
 func PromptAndInstallPython(osType config.OperatingSystem) ([]string, error) {
-
+	var urlPython []string
+	var urlDown string
 	validPythonVersions, err := RetrieveValidPythonVersions()
 	if err != nil {
 		return []string{}, fmt.Errorf("issue retrieving Python versions: %w", err)
@@ -98,16 +98,17 @@ func PromptAndInstallPython(osType config.OperatingSystem) ([]string, error) {
 		return []string{}, fmt.Errorf("issue selecting Python versions: %w", err)
 	}
 	for _, pythonVersion := range installPythonVersions {
-		err = DownloadAndInstallPython(pythonVersion, osType)
+		urlDown, err = DownloadAndInstallPython(pythonVersion, osType)
+		urlPython = append(urlPython, urlDown)
 		if err != nil {
 			return []string{}, fmt.Errorf("issue installing Python version: %w", err)
 		}
 	}
-	return installPythonVersions, nil
+	return urlPython, nil
 }
 
 // ScanAndHandlePythonVersions scans for Python versions, handles result/errors and creates PythonConfig
-func ScanAndHandlePythonVersions(osType config.OperatingSystem) error {
+func ScanAndHandlePythonVersions(osType config.OperatingSystem) ([]string, error) {
 	//pythonVersionsOrig, err := ScanForPythonVersions()
 	//if err != nil {
 	//	return []string{}, fmt.Errorf("issue occured in scanning for Python versions: %w", err)
@@ -115,9 +116,9 @@ func ScanAndHandlePythonVersions(osType config.OperatingSystem) error {
 
 	//fmt.Println("\nFound Python versions: ", strings.Join(pythonVersionsOrig, ", "), "\n")
 
-	_, _ = PromptAndInstallPython(osType)
+	urlPython, err := PromptAndInstallPython(osType)
 
-	return nil
+	return urlPython, err
 }
 
 // ScanForPythonVersions scans for Python versions in locations workbench will also look
@@ -157,30 +158,20 @@ func PythonSelectVersionsPrompt(availablePythonVersions []string) ([]string, err
 }
 
 // Downloads the Python installer, and installs Python
-func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSystem) error {
+func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSystem) (string, error) {
 	// Create InstallerInfoPython with the proper information
 	installerInfo, err := PopulateInstallerInfo("python", pythonVersion, osType)
 	if err != nil {
-		return fmt.Errorf("PopulateInstallerInfoPython: %w", err)
+		return "error: ", fmt.Errorf("PopulateInstallerInfoPython: %w", err)
 	}
 	// Download installer
 	downloadurl := "Python Version Download URL: " + installerInfo.URL
-	fmt.Println(downloadurl)
+	//fmt.Println(downloadurl)
 	if err != nil {
-		return fmt.Errorf("DownloadPython: %w", err)
+		return "error: ", fmt.Errorf("DownloadPython: %w", err)
 	}
-	// Install Python
-	err = install.InstallLanguage(osType)
-	if err != nil {
-		return fmt.Errorf("InstallLanguage: %w", err)
-	}
-	// Upgrade pip, setuptools, and wheel
-	//err = UpgradePythonTools(pythonVersion)
-	//if err != nil {
-	//	return fmt.Errorf("UpgradePythonTools: %w", err)
-	//}
 
-	return nil
+	return downloadurl, nil
 }
 
 // RemovePythonFromPath removes python or python3 from the end of a path so the directory can be used

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/samcofer/tam-offline-download-email/internal/config"
-	"github.com/samcofer/tam-offline-download-email/internal/install"
 )
 
 var availableRVersions = []string{
@@ -22,7 +21,8 @@ var availableRVersions = []string{
 
 // PromptAndInstallR Prompts user if they want to install R and does the installation
 func PromptAndInstallR(osType config.OperatingSystem) ([]string, error) {
-
+	var urlR []string
+	var urlDown string
 	validRVersions, err := RetrieveValidRVersions()
 	if err != nil {
 		return []string{}, fmt.Errorf("issue retrieving R versions: %w", err)
@@ -32,20 +32,21 @@ func PromptAndInstallR(osType config.OperatingSystem) ([]string, error) {
 		return []string{}, fmt.Errorf("issue selecting R versions: %w", err)
 	}
 	for _, rVersion := range installRVersions {
-		err = DownloadAndInstallR(rVersion, osType)
+		urlDown, err = DownloadAndInstallR(rVersion, osType)
+		urlR = append(urlR, urlDown)
 		if err != nil {
 			return []string{}, fmt.Errorf("issue installing R version: %w", err)
 		}
 	}
-	return installRVersions, nil
+	return urlR, nil
 }
 
 // ScanAndHandleRVersions scans for R versions, handles result/errors and creates RConfig
-func ScanAndHandleRVersions(osType config.OperatingSystem) error {
+func ScanAndHandleRVersions(osType config.OperatingSystem) ([]string, error) {
 
-	_, err := PromptAndInstallR(osType)
+	urlR, err := PromptAndInstallR(osType)
 
-	return err
+	return urlR, err
 }
 
 // Append to a string slice only if the string is not yet in the slice
@@ -85,22 +86,16 @@ func RSelectVersionsPrompt(availableRVersions []string) ([]string, error) {
 }
 
 // Downloads the R installer, and installs R
-func DownloadAndInstallR(rVersion string, osType config.OperatingSystem) error {
+func DownloadAndInstallR(rVersion string, osType config.OperatingSystem) (string, error) {
 	// Create InstallerInfo with the proper information
 	installerInfo, err := PopulateInstallerInfo("r", rVersion, osType)
 	if err != nil {
-		return fmt.Errorf("PopulateInstallerInfo: %w", err)
+		return "error: ", fmt.Errorf("PopulateInstallerInfo: %w", err)
 	}
 	// Download installer
 	filepath := "R " + rVersion + " download URL: " + installerInfo.URL
-	fmt.Println(filepath)
 	if err != nil {
-		return fmt.Errorf("DownloadR: %w", err)
+		return "error: ", fmt.Errorf("DownloadR: %w", err)
 	}
-	// Install R
-	err = install.InstallLanguage(osType)
-	if err != nil {
-		return fmt.Errorf("InstallLanguage: %w", err)
-	}
-	return nil
+	return filepath, nil
 }
