@@ -3,7 +3,6 @@ package system
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"time"
 )
@@ -14,15 +13,15 @@ func RunCommand(command string) error {
 	// sleep for 3 seconds to allow the user to read the command
 	time.Sleep(3 * time.Second)
 
-	cmd := exec.Command("/bin/sh", "-c", command)
+	//cmd := exec.Command("/bin/sh", "-c", command)
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("issue running command: %w", err)
-	}
+	//cmd.Stdout = os.Stdout
+	//cmd.Stderr = os.Stderr
+	//
+	//err := cmd.Run()
+	//if err != nil {
+	//	return fmt.Errorf("issue running command: %w", err)
+	//}
 
 	return nil
 }

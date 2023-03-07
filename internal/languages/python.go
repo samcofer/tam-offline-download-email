@@ -3,6 +3,7 @@ package languages
 import (
 	"errors"
 	"fmt"
+	"github.com/AlecAivazis/survey/v2"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -189,47 +190,17 @@ func PromptAndInstallPython(osType config.OperatingSystem) ([]string, error) {
 
 // ScanAndHandlePythonVersions scans for Python versions, handles result/errors and creates PythonConfig
 func ScanAndHandlePythonVersions(osType config.OperatingSystem) ([]string, error) {
-	pythonVersionsOrig, err := ScanForPythonVersions()
-	if err != nil {
-		return []string{}, fmt.Errorf("issue occured in scanning for Python versions: %w", err)
-	}
+	//pythonVersionsOrig, err := ScanForPythonVersions()
+	//if err != nil {
+	//	return []string{}, fmt.Errorf("issue occured in scanning for Python versions: %w", err)
+	//}
 
-	fmt.Println("\nFound Python versions: ", strings.Join(pythonVersionsOrig, ", "), "\n")
+	//fmt.Println("\nFound Python versions: ", strings.Join(pythonVersionsOrig, ", "), "\n")
 
-	if len(pythonVersionsOrig) == 0 {
-		scanMessage := "no Python versions found at locations: \n" + strings.Join(GetPythonRootDirs(), "\n")
-		fmt.Println(scanMessage)
+	_, _ = PromptAndInstallPython(osType)
 
-		installedPythonVersion, err := PromptAndInstallPython(osType)
-		if err != nil {
-			return []string{}, fmt.Errorf("issue installing Python: %w", err)
-		}
-		if len(installedPythonVersion) == 0 {
-			return []string{}, errors.New("no Python versions have been installed")
-		}
-	} else {
-		anyOptLocations := []string{}
-		for _, value := range pythonVersionsOrig {
-			matched, err := regexp.MatchString(".*/opt.*", value)
-			if err == nil && matched {
-				anyOptLocations = append(anyOptLocations, value)
-			}
-		}
-		if len(anyOptLocations) == 0 {
-			fmt.Println("Posit recommends installing version of Python into the /opt directory to not conflict/rely on the system installed version of Python.")
-		}
-		_, err := PromptAndInstallPython(osType)
-		if err != nil {
-			return []string{}, fmt.Errorf("issue installing Python: %w", err)
-		}
-	}
+	pythonVersions, _ := ScanForPythonVersions()
 
-	pythonVersions, err := ScanForPythonVersions()
-	if err != nil {
-		return []string{}, fmt.Errorf("issue occured in scanning for Python versions: %w", err)
-	}
-
-	fmt.Println("\nFound Python versions: ", strings.Join(pythonVersions, ", "))
 	return pythonVersions, nil
 }
 
@@ -332,7 +303,8 @@ func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSyste
 		return fmt.Errorf("PopulateInstallerInfoPython: %w", err)
 	}
 	// Download installer
-	filepath, err := install.DownloadFile("Python", installerInfo.URL, installerInfo.Name)
+	filepath := "Python Version Download URL: " + installerInfo.URL
+	fmt.Println(filepath)
 	if err != nil {
 		return fmt.Errorf("DownloadPython: %w", err)
 	}
@@ -342,10 +314,10 @@ func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSyste
 		return fmt.Errorf("InstallLanguage: %w", err)
 	}
 	// Upgrade pip, setuptools, and wheel
-	err = UpgradePythonTools(pythonVersion)
-	if err != nil {
-		return fmt.Errorf("UpgradePythonTools: %w", err)
-	}
+	//err = UpgradePythonTools(pythonVersion)
+	//if err != nil {
+	//	return fmt.Errorf("UpgradePythonTools: %w", err)
+	//}
 
 	return nil
 }

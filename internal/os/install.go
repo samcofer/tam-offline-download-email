@@ -115,7 +115,8 @@ func EnableOptionalRepo() error {
 
 // Enable the Extra Packages for Enterprise Linux (EPEL) repository
 func EnableEPELRepo(osType config.OperatingSystem) error {
-	var EPELURL string
+	EPELURL := ""
+	fmt.Println(EPELURL)
 	if osType == config.Redhat8 {
 		EPELURL = "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
 	} else if osType == config.Redhat7 {
@@ -124,7 +125,7 @@ func EnableEPELRepo(osType config.OperatingSystem) error {
 		return errors.New("operating system not supported")
 	}
 
-	EPELCommand, err := install.RetrieveInstallCommand(EPELURL, osType)
+	EPELCommand, err := install.RetrieveInstallCommand(osType)
 	if err != nil {
 		return fmt.Errorf("issue retrieving EPEL install command: %w", err)
 	}

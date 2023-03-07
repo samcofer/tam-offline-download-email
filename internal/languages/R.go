@@ -3,11 +3,10 @@ package languages
 import (
 	"errors"
 	"fmt"
-	"log"
+	"github.com/AlecAivazis/survey/v2"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/samcofer/tam-offline-download-email/internal/config"
@@ -78,42 +77,8 @@ func PromptAndInstallR(osType config.OperatingSystem) ([]string, error) {
 
 // ScanAndHandleRVersions scans for R versions, handles result/errors and creates RConfig
 func ScanAndHandleRVersions(osType config.OperatingSystem) ([]string, error) {
-	rVersionsOrig, err := ScanForRVersions()
-	if err != nil {
-		return []string{}, fmt.Errorf("issue occured in scanning for R versions: %w", err)
-	}
-	fmt.Println("\nFound R versions: ", strings.Join(rVersionsOrig, ", "))
 
-	if len(rVersionsOrig) == 0 {
-		scanMessage := "no R versions found at locations: \n" + strings.Join(GetRRootDirs(), "\n")
-		fmt.Println(scanMessage)
-
-		installedRVersion, err := PromptAndInstallR(osType)
-		if err != nil {
-			return []string{}, fmt.Errorf("issue installing R: %w", err)
-		}
-		if len(installedRVersion) == 0 {
-			log.Fatal("R must be installed to continue. Please install R and try again.")
-		}
-	} else {
-		anyOptLocations := []string{}
-		for _, value := range rVersionsOrig {
-			matched, err := regexp.MatchString(".*/opt.*", value)
-			if err == nil && matched {
-				anyOptLocations = append(anyOptLocations, value)
-			}
-		}
-		if len(anyOptLocations) == 0 {
-			fmt.Println("Posit recommends installing version of R into the /opt directory to not conflict/rely on the system installed version of R.")
-		}
-		installedRVersion, err := PromptAndInstallR(osType)
-		if err != nil {
-			return []string{}, fmt.Errorf("issue installing R: %w", err)
-		}
-		if len(installedRVersion) > 0 {
-			fmt.Println("\nThe following R versions have been installed: ", strings.Join(installedRVersion, ", "))
-		}
-	}
+	_, err := PromptAndInstallR(osType)
 
 	rVersions, err := ScanForRVersions()
 	if err != nil {
@@ -221,7 +186,8 @@ func DownloadAndInstallR(rVersion string, osType config.OperatingSystem) error {
 		return fmt.Errorf("PopulateInstallerInfo: %w", err)
 	}
 	// Download installer
-	filepath, err := install.DownloadFile("R", installerInfo.URL, installerInfo.Name)
+	filepath := "R " + rVersion + " download URL: " + installerInfo.URL
+	fmt.Println(filepath)
 	if err != nil {
 		return fmt.Errorf("DownloadR: %w", err)
 	}
