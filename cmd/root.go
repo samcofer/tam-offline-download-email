@@ -8,7 +8,7 @@ import (
 )
 
 type settings struct {
-	// logrus log level
+	// log level
 	loglevel string
 }
 
@@ -24,7 +24,7 @@ func Execute(version string, args []string) {
 func (cmd *rootCmd) Execute(args []string) {
 	cmd.cmd.SetArgs(args)
 	if err := cmd.cmd.Execute(); err != nil {
-		// if get to this point and don't fatally log in the subcommand,
+		// if it gets to this point and don't fatally log in the subcommand,
 		// the Usage help will be printed before the error,
 		// which may or may not be the desired behavior
 		log.Fatalf("failed with error: %s", err)

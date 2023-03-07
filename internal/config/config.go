@@ -2,6 +2,7 @@ package config
 
 type AuthType int
 
+//goland:noinspection ALL
 const (
 	SAML AuthType = iota + 1
 	OIDC

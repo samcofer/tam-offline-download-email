@@ -60,7 +60,7 @@ func RetrieveValidRVersions() ([]string, error) {
 	return availableRVersions, nil
 }
 
-// Prompt asking users which R version(s) they would like to install
+// RSelectVersionsPrompt Prompt asking users which R version(s) they would like to install
 func RSelectVersionsPrompt(availableRVersions []string) ([]string, error) {
 	var qs = []*survey.Question{
 		{
@@ -85,7 +85,7 @@ func RSelectVersionsPrompt(availableRVersions []string) ([]string, error) {
 	return rVersionsAnswers.RVersions, nil
 }
 
-// Downloads the R installer, and installs R
+// DownloadAndInstallR Downloads the R installer, and installs R
 func DownloadAndInstallR(rVersion string, osType config.OperatingSystem) (string, error) {
 	// Create InstallerInfo with the proper information
 	installerInfo, err := PopulateInstallerInfo("r", rVersion, osType)

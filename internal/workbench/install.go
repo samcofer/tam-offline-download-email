@@ -58,7 +58,7 @@ type RStudio struct {
 	Rspm    Installer `json:"rspm"`
 }
 
-// Retrieves JSON data from Posit, downloads the Workbench installer, and installs Workbench
+// DownloadAndInstallWorkbench Retrieves JSON data from Posit, downloads the Workbench installer, and installs Workbench
 func DownloadAndInstallWorkbench(osType config.OperatingSystem) (string, string, string, error) {
 	// Retrieve JSON data
 
@@ -82,7 +82,7 @@ func DownloadAndInstallWorkbench(osType config.OperatingSystem) (string, string,
 
 // Creates the proper command to install Workbench based on the operating system
 
-// Pulls out the installer information from the JSON data based on the operating system
+// GetInstallerInfo Pulls out the installer information from the JSON data based on the operating system
 func (r *RStudio) GetInstallerInfo(osType config.OperatingSystem) (InstallerInfo, InstallerInfo, InstallerInfo, error) {
 	switch osType {
 	case config.Ubuntu18:
@@ -100,7 +100,7 @@ func (r *RStudio) GetInstallerInfo(osType config.OperatingSystem) (InstallerInfo
 	}
 }
 
-// Retrieves JSON data from Posit
+// RetrieveWorkbenchInstallerInfo Retrieves JSON data from Posit
 func RetrieveWorkbenchInstallerInfo() (RStudio, error) {
 	client := &http.Client{
 		Timeout: 30 * time.Second,

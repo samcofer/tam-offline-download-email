@@ -5,7 +5,7 @@ import (
 	"github.com/samcofer/tam-offline-download-email/internal/config"
 )
 
-// Detect which operating system WBI is running on
+// DetectOS Detect which operating system WBI is running on
 func DetectOS(OS string) (config.OperatingSystem, error) {
 
 	var err error
@@ -21,6 +21,6 @@ func DetectOS(OS string) (config.OperatingSystem, error) {
 	case "rhel8":
 		return config.Redhat8, err
 	default:
-		return config.Unknown, errors.New("Unsupported OS")
+		return config.Unknown, errors.New("unsupported OS")
 	}
 }

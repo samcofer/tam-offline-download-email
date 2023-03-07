@@ -1,6 +1,6 @@
 package config
 
-// Prints the WBConfig configuration struct information to the console
+// DetectConfigChange Prints the WBConfig configuration struct information to the console
 func (WBConfig *WBConfig) DetectConfigChange() bool {
 	anyChange := false
 	if WBConfig.PythonConfig.JupyterPath != "" {

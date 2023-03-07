@@ -12,6 +12,7 @@ var (
 	version = "dev"
 )
 
+//goland:noinspection GoBoolExpressions,GoBoolExpressions
 func main() {
 	// normalize the config home on osx to linux and get rid of the path spacing
 	if runtime.GOOS == "darwin" {

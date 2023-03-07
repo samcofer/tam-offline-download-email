@@ -6,12 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/samcofer/tam-offline-download-email/internal/config"
+	"io"
 	"net/http"
 	"strings"
 	"time"
 )
 
-// Quarto contains product information
+// Assets Quarto contains product information
 type Assets []struct {
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
@@ -32,7 +33,9 @@ func RetrieveQuartoInstallerInfo() (Quarto, error) {
 	if err != nil {
 		return Quarto{}, errors.New("error retrieving JSON data")
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return Quarto{}, errors.New("error retrieving JSON data")
 	}

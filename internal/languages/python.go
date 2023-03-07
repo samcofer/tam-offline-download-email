@@ -85,7 +85,7 @@ var availablePythonVersions = []string{
 
 // PythonLocationPATHPrompt asks users which Python binary they want to add to PATH
 
-// Prompts user if they want to install Python and does the installation
+// PromptAndInstallPython Prompts user if they want to install Python and does the installation
 func PromptAndInstallPython(osType config.OperatingSystem) ([]string, error) {
 	var urlPython []string
 	var urlDown string
@@ -111,7 +111,7 @@ func PromptAndInstallPython(osType config.OperatingSystem) ([]string, error) {
 func ScanAndHandlePythonVersions(osType config.OperatingSystem) ([]string, error) {
 	//pythonVersionsOrig, err := ScanForPythonVersions()
 	//if err != nil {
-	//	return []string{}, fmt.Errorf("issue occured in scanning for Python versions: %w", err)
+	//	return []string{}, fmt.Errorf("issue occurred in scanning for Python versions: %w", err)
 	//}
 
 	//fmt.Println("\nFound Python versions: ", strings.Join(pythonVersionsOrig, ", "), "\n")
@@ -132,7 +132,7 @@ func RetrieveValidPythonVersions() ([]string, error) {
 	return availablePythonVersions, nil
 }
 
-// Prompt asking users which Python version(s) they would like to install
+// PythonSelectVersionsPrompt Prompt asking users which Python version(s) they would like to install
 func PythonSelectVersionsPrompt(availablePythonVersions []string) ([]string, error) {
 	var qs = []*survey.Question{
 		{
@@ -157,7 +157,7 @@ func PythonSelectVersionsPrompt(availablePythonVersions []string) ([]string, err
 	return pythonVersionsAnswers.PythonVersions, nil
 }
 
-// Downloads the Python installer, and installs Python
+// DownloadAndInstallPython Downloads the Python installer, and installs Python
 func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSystem) (string, error) {
 	// Create InstallerInfoPython with the proper information
 	installerInfo, err := PopulateInstallerInfo("python", pythonVersion, osType)
@@ -166,7 +166,6 @@ func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSyste
 	}
 	// Download installer
 	downloadurl := "\n  - Python " + pythonVersion + ": " + installerInfo.URL
-	//fmt.Println(downloadurl)
 	if err != nil {
 		return "error: ", fmt.Errorf("DownloadPython: %w", err)
 	}
