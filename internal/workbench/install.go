@@ -72,9 +72,9 @@ func DownloadAndInstallWorkbench(osType config.OperatingSystem) (string, string,
 		return "error", "error", "error", fmt.Errorf("GetInstallerInfo: %w", err)
 	}
 	// Download installer
-	WorkbenchDownLoad := "Workbench download URL: " + installerInfoWorkbench.URL
-	ConnectDownLoad := "Connect download URL: " + installerInfoConnect.URL
-	PackageManagerDownLoad := "Package Manager download URL: " + installerInfoPackagemanager.URL
+	WorkbenchDownLoad := installerInfoWorkbench.URL
+	ConnectDownLoad := installerInfoConnect.URL
+	PackageManagerDownLoad := installerInfoPackagemanager.URL
 	return WorkbenchDownLoad, ConnectDownLoad, PackageManagerDownLoad, nil
 }
 

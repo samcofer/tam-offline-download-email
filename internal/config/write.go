@@ -7,7 +7,7 @@ import (
 	"github.com/samcofer/tam-offline-download-email/internal/system"
 )
 
-// Prints the PythonConfig configuration struct information to the console
+// PythonStructToConfigWrite Prints the PythonConfig configuration struct information to the console
 func (PythonConfig *PythonConfig) PythonStructToConfigWrite() error {
 	writeLines := []string{
 		"jupyter-exe=" + PythonConfig.JupyterPath,
@@ -17,12 +17,12 @@ func (PythonConfig *PythonConfig) PythonStructToConfigWrite() error {
 	fmt.Println("\n=== Writing to the file " + filepath + ":")
 	err := system.WriteStrings(writeLines, filepath, 0644)
 	if err != nil {
-		fmt.Errorf("failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 	return nil
 }
 
-// Prints the SSLConfig configuration struct information to the console
+// SSLStructToConfigWrite Prints the SSLConfig configuration struct information to the console
 func (SSLConfig *SSLConfig) SSLStructToConfigWrite() error {
 	writeLines := []string{
 		"ssl-enabled=1",
@@ -34,12 +34,12 @@ func (SSLConfig *SSLConfig) SSLStructToConfigWrite() error {
 	fmt.Println("\n=== Writing to the file " + filepath + ":")
 	err := system.WriteStrings(writeLines, filepath, 0644)
 	if err != nil {
-		fmt.Errorf("failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 	return nil
 }
 
-// Prints the AuthConfig configuration struct information to the console
+// AuthStructToConfigWrite Prints the AuthConfig configuration struct information to the console
 func (AuthConfig *AuthConfig) AuthStructToConfigWrite() error {
 	switch AuthConfig.AuthType {
 	case SAML:
@@ -58,7 +58,7 @@ func (AuthConfig *AuthConfig) AuthStructToConfigWrite() error {
 	return nil
 }
 
-// Prints the SAMLConfig configuration struct information to the console
+// AuthSAMLStructToConfigWrite Prints the SAMLConfig configuration struct information to the console
 func (SAMLConfig *SAMLConfig) AuthSAMLStructToConfigWrite() error {
 	writeLines := []string{
 		"auth-saml=1",
@@ -70,12 +70,12 @@ func (SAMLConfig *SAMLConfig) AuthSAMLStructToConfigWrite() error {
 	fmt.Println("\n=== Writing to the file " + filepath + ":")
 	err := system.WriteStrings(writeLines, filepath, 0644)
 	if err != nil {
-		fmt.Errorf("failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 	return nil
 }
 
-// Prints the OIDCConfig configuration struct information to the console
+// AuthOIDCStructToConfigWrite Prints the OIDCConfig configuration struct information to the console
 func (OIDCConfig *OIDCConfig) AuthOIDCStructToConfigWrite() error {
 	// rserver.conf config options
 	writeLinesRserver := []string{
@@ -88,7 +88,7 @@ func (OIDCConfig *OIDCConfig) AuthOIDCStructToConfigWrite() error {
 	fmt.Println("\n=== Writing to the file " + filepathRserver + ":")
 	err := system.WriteStrings(writeLinesRserver, filepathRserver, 0644)
 	if err != nil {
-		fmt.Errorf("failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 
 	// openid-client-secret config options
@@ -101,13 +101,13 @@ func (OIDCConfig *OIDCConfig) AuthOIDCStructToConfigWrite() error {
 	fmt.Println("\n=== Writing to the file " + filepathClientSecret + ":")
 	err = system.WriteStrings(writeLinesClientSecret, filepathClientSecret, 0644)
 	if err != nil {
-		fmt.Errorf("failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 
 	return nil
 }
 
-// Prints the Package Manager URL configuration string information to the console
+// PackageManagerStringToConfigWrite Prints the Package Manager URL configuration string information to the console
 func (WBConfig *WBConfig) PackageManagerStringToConfigWrite() error {
 	if WBConfig.PackageManagerConfig.RURL != "" {
 		writeLines := []string{
@@ -118,7 +118,7 @@ func (WBConfig *WBConfig) PackageManagerStringToConfigWrite() error {
 		fmt.Println("\n=== Writing to the file " + filepath + ":")
 		err := system.WriteStrings(writeLines, filepath, 0644)
 		if err != nil {
-			fmt.Errorf("failed to write config: %w", err)
+			return fmt.Errorf("failed to write config: %w", err)
 		}
 	}
 
@@ -140,13 +140,13 @@ func (WBConfig *WBConfig) PackageManagerStringToConfigWrite() error {
 		fmt.Println("\n=== Writing to the file " + filepath + ":")
 		err := system.WriteStrings(writeLines, filepath, 0644)
 		if err != nil {
-			fmt.Errorf("failed to write config: %w", err)
+			return fmt.Errorf("failed to write config: %w", err)
 		}
 	}
 	return nil
 }
 
-// Prints the ConnectURL configuration string information to the console
+// ConnectStringToConfigWrite Prints the ConnectURL configuration string information to the console
 func (WBConfig *WBConfig) ConnectStringToConfigWrite() error {
 	writeLines := []string{
 		"default-rsconnect-server=" + WBConfig.ConnectConfig.URL,
@@ -156,7 +156,7 @@ func (WBConfig *WBConfig) ConnectStringToConfigWrite() error {
 	fmt.Println("\n=== Writing to the file " + filepath + ":")
 	err := system.WriteStrings(writeLines, filepath, 0644)
 	if err != nil {
-		fmt.Errorf("failed to write config: %w", err)
+		return fmt.Errorf("failed to write config: %w", err)
 	}
 	return nil
 }

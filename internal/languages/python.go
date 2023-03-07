@@ -165,7 +165,7 @@ func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSyste
 		return "error: ", fmt.Errorf("PopulateInstallerInfoPython: %w", err)
 	}
 	// Download installer
-	downloadurl := "Python Version Download URL: " + installerInfo.URL
+	downloadurl := "\n  - Python " + pythonVersion + ": " + installerInfo.URL
 	//fmt.Println(downloadurl)
 	if err != nil {
 		return "error: ", fmt.Errorf("DownloadPython: %w", err)

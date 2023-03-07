@@ -10,6 +10,7 @@ import (
 	"github.com/samcofer/tam-offline-download-email/internal/os"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	output "os"
 	"text/template"
 )
 
@@ -21,18 +22,20 @@ type setupCmd struct {
 type setupOpts struct {
 }
 
-type downloadURLs struct {
+type CustomerData struct {
+	Customer       string
 	R              []string
 	Python         []string
+	Quarto         string
 	Workbench      string
 	Connect        string
 	PackageManager string
 	ProDriver      string
 }
 
-func newSetup(OS string, cust string) error {
+func newSetup(OS string, customer string) error {
 
-	var URLs downloadURLs
+	var URLs CustomerData
 
 	// Determine OS and install pre-requisites
 	osType, err := os.DetectOS(OS)
@@ -61,13 +64,20 @@ func newSetup(OS string, cust string) error {
 	//drivers
 	URLs.ProDriver, err = prodrivers.DownloadAndInstallProDrivers(osType)
 
-	fmt.Println(URLs.R)
-	fmt.Println(URLs.Python)
-	fmt.Println(URLs.Workbench)
-	fmt.Println(URLs.Connect)
-	fmt.Println(URLs.PackageManager)
-	fmt.Println(URLs.ProDriver)
+	//Quarto
+	URLs.Quarto, err = languages.DownloadAndInstallQuarto(osType)
+	//fmt.Println(URLs.R)
+	//fmt.Println(URLs.Python)
+	//fmt.Println(URLs.Workbench)
+	//fmt.Println(URLs.Connect)
+	//fmt.Println(URLs.PackageManager)
+	//fmt.Println(URLs.ProDriver)
 
+	URLs.Customer = customer
+	err = EmailTemplate(URLs)
+	if err != nil {
+		return fmt.Errorf("template issue: %w", err)
+	}
 	return nil
 }
 
@@ -95,7 +105,7 @@ func newSetupCmd() *setupCmd {
 		RunE: func(_ *cobra.Command, args []string) error {
 			//TODO: Add your logic to gather config to pass code here
 			log.WithField("opts", fmt.Sprintf("%+v", root.opts)).Trace("setup-opts")
-			if err := newSetup(viper.GetString("os"), viper.GetString("cust")); err != nil {
+			if err := newSetup(viper.GetString("os"), viper.GetString("customer")); err != nil {
 				return err
 			}
 			return nil
@@ -103,14 +113,21 @@ func newSetupCmd() *setupCmd {
 	}
 	cmd.PersistentFlags().String("os", "rhel8", "destinationOS")
 	viper.BindPFlag("os", cmd.PersistentFlags().Lookup("os"))
-	cmd.PersistentFlags().String("cust", "REPLACE_ME", "Customer Name")
-	viper.BindPFlag("cust", cmd.PersistentFlags().Lookup("cust"))
+	cmd.PersistentFlags().String("customer", "REPLACE_ME", "Customer Name")
+	viper.BindPFlag("customer", cmd.PersistentFlags().Lookup("customer"))
 	root.cmd = cmd
 	return root
 }
 
-func EmailTemplate(url downloadURLs, customer string) {
+// Declare type pointer to a template
+var temp *template.Template
 
-	t, _ := template.ParseFiles("index.html")
+func EmailTemplate(custData CustomerData) error {
 
+	temp = template.Must(template.ParseFiles("email.md"))
+	err := temp.Execute(output.Stdout, custData)
+	if err != nil {
+		return err
+	}
+	return nil
 }

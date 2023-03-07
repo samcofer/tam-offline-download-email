@@ -49,7 +49,7 @@ func DownloadAndInstallProDrivers(osType config.OperatingSystem) (string, error)
 		return "error", fmt.Errorf("GetInstallerInfo: %w", err)
 	}
 
-	DriverURL := "Pro Driver Download URL: " + installerInfo.URL
+	DriverURL := installerInfo.URL
 	if err != nil {
 		return "error", fmt.Errorf("DownloadFile: %w", err)
 	}

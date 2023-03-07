@@ -93,7 +93,7 @@ func DownloadAndInstallR(rVersion string, osType config.OperatingSystem) (string
 		return "error: ", fmt.Errorf("PopulateInstallerInfo: %w", err)
 	}
 	// Download installer
-	filepath := "R " + rVersion + " download URL: " + installerInfo.URL
+	filepath := "\n  - R " + rVersion + ": " + installerInfo.URL
 	if err != nil {
 		return "error: ", fmt.Errorf("DownloadR: %w", err)
 	}
