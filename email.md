@@ -6,11 +6,11 @@ Prior to our next meeting, please download and transfer this software to the cor
   - Package Manager: {{ .PackageManager }} {{ range .R}}{{.}}{{end}}
 - Connect Required Software
   - Connect: {{ .Connect }} {{ range .R}}{{.}}{{end}} {{ range .Python}}{{.}}{{end}}
-  - Quarto:
+  - Quarto: {{ .Quarto }}
   - Professional Drivers: {{ .ProDriver }}
 - Workbench Required Software
   - Workbench: {{ .Workbench }} {{ range .R}}{{.}}{{end}} {{ range .Python}}{{.}}{{end}}
-  - Quarto:
+  - Quarto: {{ .Quarto }}
   - Professional Drivers: {{ .ProDriver }}
 
 When we start meeting, we will install the products starting with Package Manager and make our way down the list. This is because Package Manager needs to be setup in order to correctly configure both Connect and Workbench. 

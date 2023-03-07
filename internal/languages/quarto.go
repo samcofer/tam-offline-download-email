@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"github.com/samcofer/tam-offline-download-email/internal/config"
 	"net/http"
+	"strings"
 	"time"
 )
 
-// RStudio contains product information
+// Quarto contains product information
 type Assets []struct {
 	BrowserDownloadURL string `json:"browser_download_url"`
 }
@@ -63,15 +64,18 @@ func (q *Quarto) GetInstallerInfo(osType config.OperatingSystem) (string, error)
 	switch osType {
 	case config.Ubuntu18, config.Ubuntu20, config.Ubuntu22, config.Redhat8:
 		for _, val := range q.Assets {
-			fmt.Println(val.BrowserDownloadURL)
+			if strings.Contains(val.BrowserDownloadURL, "linux-amd64.tar.gz") {
+				return val.BrowserDownloadURL, nil
+			}
 		}
-		return q.Assets[0].BrowserDownloadURL, nil
 	case config.Redhat7:
 		for _, val := range q.Assets {
-			fmt.Println(val.BrowserDownloadURL)
+			if strings.Contains(val.BrowserDownloadURL, "linux-rhel7-amd64.tar.gz") {
+				return val.BrowserDownloadURL, nil
+			}
 		}
-		return q.Assets[0].BrowserDownloadURL, nil
 	default:
 		return "", errors.New("operating system not supported")
 	}
+	return "", nil
 }
