@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/samcofer/tam-offline-download-email/internal/config"
-	"github.com/samcofer/tam-offline-download-email/internal/install"
 )
 
 // InstallerInfo contains the information needed to download and install Workbench
@@ -66,45 +65,13 @@ func DownloadAndInstallWorkbench(osType config.OperatingSystem) error {
 		return fmt.Errorf("GetInstallerInfo: %w", err)
 	}
 	// Download installer
-	filepath := install.DownloadFile(installerInfo.URL, installerInfo.BaseName)
-	if err != nil {
-		return fmt.Errorf("DownloadFile: %w", err)
-	}
-	// Install Workbench
-	err = InstallWorkbench(filepath, osType)
-	if err != nil {
-		return fmt.Errorf("InstallWorkbench: %w", err)
-	}
+	fmt.Println("Workbench download URL: " + installerInfo.URL)
 	return nil
 }
 
 // Installs Workbench in a certain way based on the operating system
-func InstallWorkbench(filepath string, osType config.OperatingSystem) error {
-	_, err := RetrieveInstallCommandForWorkbench(filepath, osType)
-	if err != nil {
-		return fmt.Errorf("RetrieveInstallCommandForWorkbench: %w", err)
-	}
-
-	//err = system.RunCommand(installCommand)
-	if err != nil {
-		return fmt.Errorf("issue installing Workbench: %w", err)
-	}
-
-	//fmt.Println("Workbench Install Command: " + installCommand)
-	return nil
-}
 
 // Creates the proper command to install Workbench based on the operating system
-func RetrieveInstallCommandForWorkbench(filepath string, osType config.OperatingSystem) (string, error) {
-	switch osType {
-	case config.Ubuntu22, config.Ubuntu20, config.Ubuntu18:
-		return "gdebi -n " + filepath, nil
-	case config.Redhat7, config.Redhat8:
-		return "yum install -y " + filepath, nil
-	default:
-		return "", errors.New("operating system not supported")
-	}
-}
 
 // Pulls out the installer information from the JSON data based on the operating system
 func (r *RStudio) GetInstallerInfo(osType config.OperatingSystem) (InstallerInfo, error) {

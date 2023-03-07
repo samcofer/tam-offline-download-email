@@ -4,12 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"regexp"
-	"strings"
-
 	"github.com/samcofer/tam-offline-download-email/internal/config"
 	"github.com/samcofer/tam-offline-download-email/internal/install"
 )
@@ -82,40 +76,11 @@ var availablePythonVersions = []string{
 	"3.7.0",
 }
 
-var globalPythonPaths = []string{
-	"/usr/bin/python",
-	"/usr/bin/Python",
-	"/usr/local/bin/python",
-	"/usr/local/bin/Python",
-	"/usr/lib/python",
-	"/usr/lib/Python",
-}
-var rootPythonDirs = []string{
-	"/opt/python",
-	"/opt/Python",
-	"/usr/local/lib/python",
-	"/usr/local/lib/Python",
-}
-
 // GetPythonRootDirs returns the root directories for Python
-func GetPythonRootDirs() []string {
-	return rootPythonDirs
-}
 
 // GetPythonPaths returns the paths workbench will look for Python
 // underneath the root directories with the format
 // /root/{pythonVersion}/bin/python
-func GetPythonPaths() []string {
-	return globalPythonPaths
-}
-
-func isPythonDir(path string) (string, bool) {
-	pythonPath := filepath.Join(path, "bin", "python")
-	if _, err := os.Stat(pythonPath); err == nil {
-		return pythonPath, true
-	}
-	return pythonPath, false
-}
 
 // PromptAndSetPythonPATH prompts user to set Python PATH
 
@@ -123,32 +88,26 @@ func isPythonDir(path string) (string, bool) {
 
 // Prompts user if they want to install Python and does the installation
 func PromptAndInstallPython(osType config.OperatingSystem) ([]string, error) {
-	installPythonChoice, err := PythonInstallPrompt()
+
+	validPythonVersions, err := RetrieveValidPythonVersions()
 	if err != nil {
-		return []string{}, fmt.Errorf("issue selecting Python installation: %w", err)
+		return []string{}, fmt.Errorf("issue retrieving Python versions: %w", err)
 	}
-	if installPythonChoice {
-		validPythonVersions, err := RetrieveValidPythonVersions()
-		if err != nil {
-			return []string{}, fmt.Errorf("issue retrieving Python versions: %w", err)
-		}
-		installPythonVersions, err := PythonSelectVersionsPrompt(validPythonVersions)
-		if err != nil {
-			return []string{}, fmt.Errorf("issue selecting Python versions: %w", err)
-		}
-		for _, pythonVersion := range installPythonVersions {
-			err = DownloadAndInstallPython(pythonVersion, osType)
-			if err != nil {
-				return []string{}, fmt.Errorf("issue installing Python version: %w", err)
-			}
-		}
-		return installPythonVersions, nil
+	installPythonVersions, err := PythonSelectVersionsPrompt(validPythonVersions)
+	if err != nil {
+		return []string{}, fmt.Errorf("issue selecting Python versions: %w", err)
 	}
-	return []string{}, nil
+	for _, pythonVersion := range installPythonVersions {
+		err = DownloadAndInstallPython(pythonVersion, osType)
+		if err != nil {
+			return []string{}, fmt.Errorf("issue installing Python version: %w", err)
+		}
+	}
+	return installPythonVersions, nil
 }
 
 // ScanAndHandlePythonVersions scans for Python versions, handles result/errors and creates PythonConfig
-func ScanAndHandlePythonVersions(osType config.OperatingSystem) ([]string, error) {
+func ScanAndHandlePythonVersions(osType config.OperatingSystem) error {
 	//pythonVersionsOrig, err := ScanForPythonVersions()
 	//if err != nil {
 	//	return []string{}, fmt.Errorf("issue occured in scanning for Python versions: %w", err)
@@ -158,58 +117,12 @@ func ScanAndHandlePythonVersions(osType config.OperatingSystem) ([]string, error
 
 	_, _ = PromptAndInstallPython(osType)
 
-	pythonVersions, _ := ScanForPythonVersions()
-
-	return pythonVersions, nil
+	return nil
 }
 
 // ScanForPythonVersions scans for Python versions in locations workbench will also look
-func ScanForPythonVersions() ([]string, error) {
-	foundVersions := []string{}
-	// This is somewhat naive with respect to actually checking whether
-	// this is _really_ a working version of Python by launching it,
-	// vs just matches the path to Python
-	for _, pyPath := range GetPythonPaths() {
-		if _, err := os.Stat(pyPath); err == nil {
-			foundVersions = append(foundVersions, pyPath)
-		}
-
-	}
-	for _, rootPath := range GetPythonRootDirs() {
-		entries, err := os.ReadDir(rootPath)
-		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			return foundVersions, err
-		}
-		for _, entry := range entries {
-			if entry.IsDir() {
-				pythonPath, isPython := isPythonDir(filepath.Join(rootPath, entry.Name()))
-				if isPython {
-					foundVersions = append(foundVersions, pythonPath)
-				}
-			}
-		}
-	}
-
-	maybePython, err := exec.LookPath("python3")
-	if err == nil {
-		foundVersions = AppendIfMissing(foundVersions, maybePython)
-	}
-
-	return foundVersions, nil
-}
 
 // Prompt users if they would like to install Python versions
-func PythonInstallPrompt() (bool, error) {
-	name := true
-	prompt := &survey.Confirm{
-		Message: "Would you like to install version(s) of Python?",
-	}
-	err := survey.AskOne(prompt, &name)
-	if err != nil {
-		return false, errors.New("there was an issue with the Python install prompt")
-	}
-	return name, nil
-}
 
 // PythonPATHPrompt asks users if they would like to set Python PATH
 
@@ -251,8 +164,8 @@ func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSyste
 		return fmt.Errorf("PopulateInstallerInfoPython: %w", err)
 	}
 	// Download installer
-	filepath := "Python Version Download URL: " + installerInfo.URL
-	fmt.Println(filepath)
+	downloadurl := "Python Version Download URL: " + installerInfo.URL
+	fmt.Println(downloadurl)
 	if err != nil {
 		return fmt.Errorf("DownloadPython: %w", err)
 	}
@@ -271,18 +184,5 @@ func DownloadAndInstallPython(pythonVersion string, osType config.OperatingSyste
 }
 
 // RemovePythonFromPath removes python or python3 from the end of a path so the directory can be used
-func RemovePythonFromPath(pythonPath string) (string, error) {
-	if _, err := regexp.MatchString(".*/python.*", pythonPath); err == nil {
-		i := strings.LastIndex(pythonPath, "/python")
-		excludingLast := pythonPath[:i] + strings.Replace(pythonPath[i:], "/python", "", 1)
-		return excludingLast, nil
-	} else if _, err := regexp.MatchString(".*/python3.*", pythonPath); err == nil {
-		i := strings.LastIndex(pythonPath, "/python3")
-		excludingLast := pythonPath[:i] + strings.Replace(pythonPath[i:], "/python3", "", 1)
-		return excludingLast, nil
-	} else {
-		return pythonPath, nil
-	}
-}
 
 // RemovePythonFromPathSlice removes python or python3 from the end of a set of path strings in a slice so the directories can be used

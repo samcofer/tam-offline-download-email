@@ -36,6 +36,7 @@ func setGlobalSettings(cfg *settings) {
 	setLogLevel(cfg.loglevel)
 }
 func newRootCmd(version string) *rootCmd {
+
 	root := &rootCmd{cfg: &settings{}}
 	cmd := &cobra.Command{
 		Use:   "wbi",

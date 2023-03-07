@@ -20,7 +20,7 @@ type InstallerInfo struct {
 
 // OperatingSystems contains the installer information for each supported operating system
 type OperatingSystems struct {
-	// Posit Pro Drivers are the same for all Ubuntu versions so we only need one
+	// Posit Pro Drivers are the same for all Ubuntu versions, so we only need one
 	Focal   InstallerInfo `json:"focal"`
 	Redhat7 InstallerInfo `json:"redhat7_64"`
 	Redhat8 InstallerInfo `json:"rhel8"`
@@ -36,7 +36,7 @@ type ProDrivers struct {
 	ProDrivers Installer `json:"pro_drivers"`
 }
 
-// Retrieves JSON data from Posit, downloads the Pro Drivers installer, and installs Pro Drivers
+// DownloadAndInstallProDrivers Retrieves JSON data from Posit, downloads the Pro Drivers installer, and installs Pro Drivers
 func DownloadAndInstallProDrivers(osType config.OperatingSystem) error {
 	// Retrieve JSON data
 	rstudio, err := RetrieveProDriversInstallerInfo()
@@ -70,11 +70,11 @@ func DownloadAndInstallProDrivers(osType config.OperatingSystem) error {
 	//if err != nil {
 	//	return fmt.Errorf("BackupAndAppendODBCConfiguration: %w", err)
 	//}
-	//fmt.Println("\nPosit Pro Drivers next steps:\nNow that the Pro Drivers are installed and /etc/odbcinst.ini is setup, the next step is to test database connectivity and/or create DSNs in your /etc/odbc.ini file.\n\n More information about each of these steps can be found here: https://docs.posit.co/pro-drivers/workbench-connect/#step-4-testing-database-connectivity\n")
+	//fmt.Println("\nPosit Pro Drivers next steps:\nNow that the Pro Drivers are installed and /etc/odbcinst.ini is set up, the next step is to test database connectivity and/or create DSNs in your /etc/odbc.ini file.\n\n More information about each of these steps can be found here: https://docs.posit.co/pro-drivers/workbench-connect/#step-4-testing-database-connectivity\n")
 	return nil
 }
 
-// Retrieves JSON data from Posit
+// RetrieveProDriversInstallerInfo Retrieves JSON data from Posit
 func RetrieveProDriversInstallerInfo() (ProDrivers, error) {
 	client := &http.Client{
 		Timeout: 30 * time.Second,
@@ -100,7 +100,7 @@ func RetrieveProDriversInstallerInfo() (ProDrivers, error) {
 	return proDrivers, nil
 }
 
-// Pulls out the installer information from the JSON data based on the operating system
+// GetInstallerInfo Pulls out the installer information from the JSON data based on the operating system
 func (pd *ProDrivers) GetInstallerInfo(osType config.OperatingSystem) (InstallerInfo, error) {
 	switch osType {
 	// Posit Pro Drivers are the same for all Ubuntu versions

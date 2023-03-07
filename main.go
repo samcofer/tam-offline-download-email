@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	version string = "dev"
-	commit  string = "none"
+	version = "dev"
 )
 
 func main() {
@@ -21,5 +20,6 @@ func main() {
 		os.Setenv("XDG_DATA_HOME", filepath.Join(hd, ".local", "share"))
 		xdg.Reload()
 	}
+
 	cmd.Execute(version, os.Args[1:])
 }

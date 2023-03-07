@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/samcofer/tam-offline-download-email/internal/prodrivers"
 	"github.com/samcofer/tam-offline-download-email/internal/workbench"
+	"github.com/spf13/viper"
 
-	"github.com/samber/lo"
-	"github.com/samcofer/tam-offline-download-email/internal/config"
 	"github.com/samcofer/tam-offline-download-email/internal/languages"
 	"github.com/samcofer/tam-offline-download-email/internal/os"
 	log "github.com/sirupsen/logrus"
@@ -21,9 +20,7 @@ type setupCmd struct {
 type setupOpts struct {
 }
 
-func newSetup() error {
-
-	var WBConfig config.WBConfig
+func newSetup(OS string) error {
 
 	//fmt.Println("Welcome to the Workbench Installer!\n")
 
@@ -32,55 +29,32 @@ func newSetup() error {
 	//if err != nil {
 	//	return err
 	//}
-
 	// Determine OS and install pre-requisites
-	osType, err := os.DetectOS()
-	if err != nil {
-		return err
-	}
 
-	// Languages
-	selectedLanguages, err := languages.PromptAndRespond()
+	osType, err := os.DetectOS(OS)
 	if err != nil {
 		return fmt.Errorf("issue selecting languages: %w", err)
 	}
 
 	// R
-	WBConfig.RConfig.Paths, err = languages.ScanAndHandleRVersions(osType)
+	err = languages.ScanAndHandleRVersions(osType)
 	if err != nil {
 		return fmt.Errorf("issue finding R locations: %w", err)
 	}
-	// remove any path that starts with /usr and only offer symlinks for those that don't (i.e. /opt directories)
-	rPathsFiltered := languages.RemoveSystemRPaths(WBConfig.RConfig.Paths)
-	// check if R and Rscript has already been symlinked
-	rSymlinked := languages.CheckIfRSymlinkExists()
-	rScriptSymlinked := languages.CheckIfRscriptSymlinkExists()
-	if (len(rPathsFiltered) > 0) && !rSymlinked && !rScriptSymlinked {
-		err = languages.PromptAndSetRSymlinks(rPathsFiltered)
-		if err != nil {
-			return fmt.Errorf("issue setting R symlinks: %w", err)
-		}
-	}
-	if lo.Contains(selectedLanguages, "python") {
-		WBConfig.PythonConfig.Paths, err = languages.ScanAndHandlePythonVersions(osType)
-		if err != nil {
-			return fmt.Errorf("issue finding Python locations: %w", err)
-		}
+
+	//Python
+	err = languages.ScanAndHandlePythonVersions(osType)
+	if err != nil {
+		return fmt.Errorf("issue finding Python locations: %w", err)
 	}
 
-	// If Workbench is not detected then prompt to install
-
+	//workbench
 	workbench.DownloadAndInstallWorkbench(osType)
 	if err != nil {
 		return fmt.Errorf("issue installing Workbench: %w", err)
 	}
 
-	// Pro Drivers
-	//proDriversExistingStatus, err := prodrivers.CheckExistingProDrivers()
-	if err != nil {
-		return fmt.Errorf("issue in checking for prior pro driver installation: %w", err)
-	}
-
+	//drivers
 	prodrivers.DownloadAndInstallProDrivers(osType)
 
 	return nil
@@ -110,12 +84,14 @@ func newSetupCmd() *setupCmd {
 		RunE: func(_ *cobra.Command, args []string) error {
 			//TODO: Add your logic to gather config to pass code here
 			log.WithField("opts", fmt.Sprintf("%+v", root.opts)).Trace("setup-opts")
-			if err := newSetup(); err != nil {
+			if err := newSetup(viper.GetString("os")); err != nil {
 				return err
 			}
 			return nil
 		},
 	}
+	cmd.PersistentFlags().String("os", "rhel8", "destinationOS")
+	viper.BindPFlag("os", cmd.PersistentFlags().Lookup("os"))
 	root.cmd = cmd
 	return root
 }
