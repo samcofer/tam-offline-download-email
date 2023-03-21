@@ -93,8 +93,8 @@ func newSetupCmd() *setupCmd {
 	root := &setupCmd{opts: setupOpts{}}
 
 	cmd := &cobra.Command{
-		Use:   "setup",
-		Short: "setup",
+		Use:   "generate",
+		Short: "generate",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			setSetupOpts()
 			if err := root.opts.Validate(); err != nil {
@@ -111,7 +111,7 @@ func newSetupCmd() *setupCmd {
 			return nil
 		},
 	}
-	cmd.PersistentFlags().String("os", "rhel8", "destinationOS")
+	cmd.PersistentFlags().String("os", "rhel8", "Install destination OS, value values: rhel7-8,ubuntu18,20,22 ")
 	viper.BindPFlag("os", cmd.PersistentFlags().Lookup("os"))
 	cmd.PersistentFlags().String("customer", "REPLACE_ME", "Customer Name")
 	viper.BindPFlag("customer", cmd.PersistentFlags().Lookup("customer"))
